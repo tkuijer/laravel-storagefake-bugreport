@@ -2,20 +2,24 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function test_example()
+    public function test_avatars_can_be_uploaded()
     {
-        $response = $this->get('/');
+        Storage::fake('avatars');
+
+        $file = UploadedFile::fake()->image('avatar.jpg');
+
+        $response = $this->post('/avatar', [
+            'avatar' => $file,
+        ]);
 
         $response->assertStatus(200);
+
+        Storage::disk('avatars')->assertExists($file->hashName());
     }
 }
